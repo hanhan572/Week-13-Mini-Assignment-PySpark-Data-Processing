@@ -1,0 +1,33 @@
+step,seconds
+1. raw row count,0.61
+3. lazy: 9 transformations,0.03
+3. eager: collect(),2.37
+"4. write curated_trips (partitionBy, no shuffle)",196.66
+4. write aggregates/monthly,25.76
+4. write aggregates/borough_time_of_day,22.94
+4. write aggregates/hourly,19.09
+4. write aggregates/top_routes,12.66
+4. write aggregates/top_zones_per_borough,12.02
+5. curated row count (read-back check),0.34
+6b-1 filter via year()/month() (no pushdown),8.54
+6b-1 filter via range (pushed down),1.05
+6b-2 read all 19 columns,8.56
+6b-2 read only needed column (pruned),0.41
+6b-3 sort-merge join (broadcast disabled),7.85
+6b-3 broadcast hash join,2.63
+6b-4 curated: partition-pruned (year_month = '2024-06'),0.09
+6b-4 curated: no pruning (year()/month()),3.19
+"6b-5 groupBy(pu_zone,do_zone): 200 shuffle partitions (AQE off)",7.74
+"6b-5 groupBy(pu_zone,do_zone): 32 shuffle partitions (AQE off)",6.9
+"6b-5 groupBy(pu_zone,do_zone): 32 + AQE on",7.85
+6b-6 write with repartition('year_month') (full shuffle),273.83
+7 NO cache: action 1 count(),14.89
+7 NO cache: action 2 avg fare by borough,18.68
+7 NO cache: action 3 avg speed by hour,21.17
+7 NO cache: action 4 trips by month,43.76
+7 NO cache: action 5 max fare per pickup zone,7.58
+7 WITH cache: action 1 count(),70.49
+7 WITH cache: action 2 avg fare by borough,3.85
+7 WITH cache: action 3 avg speed by hour,2.61
+7 WITH cache: action 4 trips by month,2.12
+7 WITH cache: action 5 max fare per pickup zone,4.45
